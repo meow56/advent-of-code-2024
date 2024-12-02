@@ -21,5 +21,25 @@ function day02(input) {
 		return acc + 1;
 	}, 0);
 
+	let totalSafe2 = reports.reduce(function(acc, val) {
+		for(let remove = 0; remove < val.length; remove++) {
+			let newVal = [...val.slice(0, remove), ...val.slice(remove + 1)];
+			let isUp = newVal[1] - newVal[0] > 0;
+			let valid = true;
+			for(let i = 1; i < newVal.length; i++) {
+				let diff = newVal[i] - newVal[i - 1];
+				if((diff > 0) !== isUp) {
+					valid = false;
+				}
+				if(Math.abs(diff) > 3 || diff === 0) {
+					valid = false;
+				}
+			}
+			if(valid) return acc + 1;
+		}
+		return acc;
+	}, 0);
+
 	displayCaption(`The total safe reports is ${totalSafe}.`);
+	displayCaption(`The actual total safe reports is ${totalSafe2}.`);
 }
