@@ -11,6 +11,7 @@ window.onload = function() {
 }
 
 async function handleFiles() {
+	clearPanes();
 	clearText();
 	clearCaption();
 	clearBlocks();
@@ -92,3 +93,38 @@ function clearButtons() {
 		buttons.removeChild(button);
 	}
 }
+
+function paneClosure() {
+	const panes = new Map();
+	const buttons = new Map();
+	function assignPane(id, name) {
+		if(panes.has(id)) {
+			throw `Pane with id ${id} already exists.`;
+		}
+		panes.set(id, assignBlock(`pane_${id}`));
+		buttons.set(id, assignButton(function() {
+			for(let pane of panes.values()) {
+				pane.classList.add(`hidden`);
+			}
+			panes.get(id).classList.remove(`hidden`);
+		}, `Switch to ${name} pane`));
+		if(panes.size !== 1) panes.get(id).classList.add(`hidden`);
+	}
+
+	function displayToPane(id, text = "") {
+		if(panes.has(id)) {
+			panes.get(id).displayText(text);
+		} else {
+			console.warn(`Cannot find pane with id ${id}.`);
+		}
+	}
+
+	function clearPanes() {
+		panes.clear();
+		buttons.clear();
+	}
+
+	return [assignPane, displayToPane, clearPanes];
+}
+
+const [assignPane, displayToPane, clearPanes] = paneClosure();

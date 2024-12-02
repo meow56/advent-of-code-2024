@@ -10,9 +10,6 @@ function day01(input) {
 		list2.push(+(entry[2]));
 	}
 
-	let unsorted1 = list1.slice();
-	let unsorted2 = list2.slice();
-
 	list1.sort((a, b) => a - b);
 	list2.sort((a, b) => a - b);
 
@@ -25,20 +22,21 @@ function day01(input) {
 
 	let counts = new Map();
 
-	for(let i = 0; i < unsorted2.length; i++) {
-		if(counts.has(unsorted2[i])) {
-			counts.set(unsorted2[i], counts.get(unsorted2[i]) + 1);
+	for(let num of list2) {
+		if(counts.has(num)) {
+			counts.set(num, counts.get(num) + 1);
 		} else {
-			counts.set(unsorted2[i], 1);
+			counts.set(num, 1);
 		}
 	}
 
 	let simScore = 0;
 	let indivScores = [];
-	for(let i = 0; i < unsorted1.length; i++) {
-		if(counts.has(unsorted1[i])) {
-			simScore += counts.get(unsorted1[i]) * unsorted1[i];
-			indivScores.push(counts.get(unsorted1[i]) * unsorted1[i]);
+	for(let num of list1) {
+		if(counts.has(num)) {
+			let thisScore = counts.get(num) * num;
+			simScore += thisScore;
+			indivScores.push(thisScore);
 		} else {
 			indivScores.push(0);
 		}
@@ -47,41 +45,18 @@ function day01(input) {
 	displayCaption(`The total distance is ${totalDist}.`);
 	displayCaption(`The similarity score is ${simScore}.`);
 	displayCaption(`The sorted list of numbers is shown with the distance between each pair in between.`);
-	displayCaption(`Click the button to switch to part 2, where the similarity score for each number on the left is shown.`);
+	displayCaption(`On the similarity score pane is where the similarity score for each number on the left is shown.`);
 
-	const DIST_PRE = assignBlock(`dist`);
-	const SIM_PRE = assignBlock(`sim`);
+	assignPane(`dist`, `Distances`);
+	assignPane(`sim`, `Similarity Scores`);
 
-	function toggleClosure() {
-		let isDist = true;
-
-		function toggle() {
-			isDist = !isDist;
-			if(isDist) {
-				DIST_PRE.displayText(`List 1	Dist	List 2`);
-				for(let i = 0; i < indivDists.length; i++) {
-					DIST_PRE.displayText(`${list1[i]}	${indivDists[i]}	${list2[i]}`);
-				}
-				SIM_PRE.clearText();
-			} else {
-				SIM_PRE.displayText(`Left List	Similarity Score`)
-				for(let i = 0; i < indivDists.length; i++) {
-					SIM_PRE.displayText(`${unsorted1[i]}		${indivScores[i]}`);
-				}
-				DIST_PRE.clearText();
-			}
-		}
-
-		return toggle;
-	}
-
-	let toggle = toggleClosure();
-
-	const TOGGLE_BUTTON = assignButton(toggle, `Switch Part`);
-
-	DIST_PRE.displayText(`List 1	Dist	List 2`);
+	displayToPane(`dist`, `List 1	Dist	List 2`);
 	for(let i = 0; i < indivDists.length; i++) {
-		DIST_PRE.displayText(`${list1[i]}	${indivDists[i]}	${list2[i]}`);
+		displayToPane(`dist`, `${list1[i]}	${indivDists[i]}	${list2[i]}`);
 	}
-	SIM_PRE.clearText();
+
+	displayToPane(`sim`, `List 1	Similarity Score`);
+	for(let i = 0; i < indivDists.length; i++) {
+		displayToPane(`sim`, `${list1[i]}	${indivScores[i]}`);
+	}
 }
