@@ -10,6 +10,18 @@
 	background-color: orange;
 }
 
+.green {
+	background-color: green;
+}
+
+.skyblue {
+	background-color: #57b7ff;
+}
+
+.lightblue {
+	background-color: #addcff;
+}
+
 .text-red {
 	color: red;
 }
