@@ -63,5 +63,24 @@ function day04(input) {
 
 	findXMASInGrid(diagUR);
 
+	let x_mas = 0;
+	for(let i = 0; i < grid.length - 2; i++) {
+		for(let j = 0; j < grid[i].length - 2; j++) {
+			let target = [
+				[grid[i][j], grid[i][j + 1], grid[i][j + 2]],
+				[grid[i + 1][j], grid[i + 1][j + 1], grid[i + 1][j + 2]],
+				[grid[i + 2][j], grid[i + 2][j + 1], grid[i + 2][j + 2]],
+			];
+			if((target[0][0] === "M" && target[1][1] === "A" && target[2][2] === "S")
+				|| (target[0][0] === "S" && target[1][1] === "A" && target[2][2] === "M")) {
+				if((target[2][0] === "M" && target[0][2] === "S")
+					|| (target[2][0] === "S" && target[0][2] === "M")) {
+					x_mas++;
+				}
+			}
+		}
+	}
+
 	displayCaption(`The number of XMAS is ${xmas}.`);
+	displayCaption(`The number of X-MAS is ${x_mas}.`);
 }
