@@ -25,6 +25,7 @@ function day05(input) {
 	}
 
 	let midSum = 0;
+	let incorrect = [];
 	for(let print of prints) {
 		let valid = true;
 		for(let i = 0; i < print.length; i++) {
@@ -47,8 +48,22 @@ function day05(input) {
 		}
 		if(valid) {
 			midSum += print[(print.length - 1) / 2];
+		} else {
+			incorrect.push(print);
 		}
 	}
 
+	let midSum2 = 0;
+	for(let print of incorrect) {
+		let correctlySorted = print.toSorted(function(a, b) {
+			let [aAhead, aBehind] = getRules(a);
+			let [bAhead, bBehind] = getRules(b);
+			if(aAhead.includes(b) || bBehind.includes(a)) return -1;
+			return 1;
+		});
+		midSum2 += correctlySorted[(correctlySorted.length - 1) / 2];
+	}
+
 	displayCaption(`The middle sum is ${midSum}.`);
+	displayCaption(`The middle sum 2 is ${midSum2}.`);
 }
