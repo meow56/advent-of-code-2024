@@ -58,16 +58,51 @@ function day06(input) {
 	}
 
 	let loopers = 0;
-	for(let i = 0; i < grid.length; i++) {
-		for(let j = 0; j < grid[i].length; j++) {
-			if(grid[i][j] === '#') continue;
-			if(grid[i][j] === '^') continue;
-			let mapKey = `${j},${i}`;
-			if(!visited.has(mapKey)) continue;
-			if(poopyLoopy([j, i])) loopers++;
+	let validLoops = new Map();
+	for(let pos of visited.keys()) {
+		let newPos = pos.split(",").map(e => +e);
+		if(grid[newPos[1]][newPos[0]] === "^") continue;
+		if(poopyLoopy(newPos)) {
+			loopers++;
+			validLoops.set(newPos.join(","));
 		}
 	}
 
 	displayCaption(`The total number of visited tiles is ${visited.size}.`);
 	displayCaption(`The number of possible loops is ${loopers}.`);
+	displayCaption(`The grid is shown.`);
+	displayCaption(`In part 1, the lightly shaded tiles (▒) are the tiles the guard walks on.`);
+	displayCaption(`In part 2, the shaded tiles (▓) are the tiles that cause loops when an obstruction is placed on them.`);
+
+	assignPane("p1", "Part 1");
+	assignPane("p2", "Part 2");
+
+	for(let i = 0; i < grid.length; i++) {
+		let lineDisplay1 = "";
+		let lineDisplay2 = "";
+		for(let j = 0; j < grid[i].length; j++) {
+			let mapKey = `${j},${i}`;
+			if(grid[i][j] === "^") {
+				lineDisplay1 += "^";
+			} else if(visited.has(mapKey)) {
+				lineDisplay1 += "▒";
+			} else if(grid[i][j] === ".") {
+				lineDisplay1 += " ";
+			} else {
+				lineDisplay1 += "█"
+			}
+
+			if(grid[i][j] === "^") {
+				lineDisplay2 += "^";
+			} else if(validLoops.has(mapKey)) {
+				lineDisplay2 += "▓";
+			} else if(grid[i][j] === ".") {
+				lineDisplay2 += " ";
+			} else {
+				lineDisplay2 += "█"
+			}
+		}
+		displayToPane("p1", lineDisplay1);
+		displayToPane("p2", lineDisplay2);
+	}
 }
