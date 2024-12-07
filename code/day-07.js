@@ -9,22 +9,38 @@ function day07(input) {
 		lines.push([+entry[1], entry[2].split(" ").map(e => +e)]);
 	}
 
-	function recurse(target, nums, curr) {
+	function recurse(target, nums, curr, operators = []) {
 		if(target < curr) return false;
-		if(nums.length === 0) return target === curr;
+		if(nums.length === 0) return target === curr ? operators : false;
 		let newNums = nums.slice();
 		let next = newNums.shift();
-		return recurse(target, newNums, curr * next) || recurse(target, newNums, curr + next);
+		return recurse(target, newNums, curr * next, [...operators, "*"])
+		 || recurse(target, newNums, curr + next, [...operators, "+"]);
 	}
 
-	function recurse2(target, nums, curr) {
+	function recurse2(target, nums, curr, operators = []) {
 		if(target < curr) return false;
-		if(nums.length === 0) return target === curr;
+		if(nums.length === 0) return target === curr ? operators : false;
 		let newNums = nums.slice();
 		let next = newNums.shift();
-		return recurse2(target, newNums, curr * next)
-		 || recurse2(target, newNums, +(curr.toString() + next.toString()))
-		 || recurse2(target, newNums, curr + next);
+		return recurse2(target, newNums, curr * next, [...operators, "*"])
+		 || recurse2(target, newNums, +(curr.toString() + next.toString()), [...operators, "||"])
+		 || recurse2(target, newNums, curr + next, [...operators, "+"]);
+	}
+
+
+	function disp(line, operators) {
+		let displayLine = `${line[0]} ===`;
+		let numbers = line[1].slice();
+		let ops = operators.slice();
+		while(numbers.length > 0) {
+			displayLine += ` ${numbers.shift()}`;
+			if(ops.length > 0) {
+				displayLine += ` ${ops.shift()}`;
+			}
+		}
+
+		displayText(displayLine);
 	}
 
 	let sum = 0;
@@ -32,10 +48,26 @@ function day07(input) {
 	for(let line of lines) {
 		let newNums = line[1].slice();
 		let next = newNums.shift();
-		if(recurse(line[0], newNums, next)) sum += line[0];
-		if(recurse2(line[0], newNums, next)) sum2 += line[0];
+		let result = recurse(line[0], newNums, next);
+		if(result) {
+			sum += line[0];
+			sum2 += line[0];
+			disp(line, result);
+		} else {
+			let result2 = recurse2(line[0], newNums, next);
+			if(recurse2(line[0], newNums, next)) {
+				sum2 += line[0];
+				disp(line, result2);
+			} else {
+				displayText(`${line[0]} !== ${line[1].join(" ")}`)
+			}
+		}
 	}
 
 	displayCaption(`The sum is ${sum}.`);
-	displayCaption(`The sum2 is ${sum2}.`);
+	displayCaption(`The sum with concatenation is ${sum2}.`);
+	displayCaption(`The equations are shown.`);
+	displayCaption(`If it says [number] === [equation], then it's a valid equation.`);
+	displayCaption(`It prioritizes using an equation without concatenation.`);
+	displayCaption(`Otherwise, it'll say !==, in which case there is no valid equation.`);
 }
