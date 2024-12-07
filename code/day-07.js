@@ -17,12 +17,25 @@ function day07(input) {
 		return recurse(target, newNums, curr * next) || recurse(target, newNums, curr + next);
 	}
 
+	function recurse2(target, nums, curr) {
+		if(target < curr) return false;
+		if(nums.length === 0) return target === curr;
+		let newNums = nums.slice();
+		let next = newNums.shift();
+		return recurse2(target, newNums, curr * next)
+		 || recurse2(target, newNums, +(curr.toString() + next.toString()))
+		 || recurse2(target, newNums, curr + next);
+	}
+
 	let sum = 0;
+	let sum2 = 0;
 	for(let line of lines) {
 		let newNums = line[1].slice();
 		let next = newNums.shift();
 		if(recurse(line[0], newNums, next)) sum += line[0];
+		if(recurse2(line[0], newNums, next)) sum2 += line[0];
 	}
 
 	displayCaption(`The sum is ${sum}.`);
+	displayCaption(`The sum2 is ${sum2}.`);
 }
