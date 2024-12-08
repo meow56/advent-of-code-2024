@@ -21,6 +21,7 @@ function day08(input) {
 	}
 
 	let antinodes = new Map();
+	let antinodes2 = new Map();
 	for(let positions of antennae.values()) {
 		for(let i = 0; i < positions.length; i++) {
 			for(let j = i + 1; j < positions.length; j++) {
@@ -35,9 +36,22 @@ function day08(input) {
 				if(anti2[0] >= 0 && anti2[0] < row && anti2[1] >= 0 && anti2[1] < colSize) {
 					antinodes.set(anti2.join(","));
 				}
+
+				antinodes2.set(pos1.join(","));
+				antinodes2.set(pos2.join(","));
+				while(anti1[0] >= 0 && anti1[0] < row && anti1[1] >= 0 && anti1[1] < colSize) {
+					antinodes2.set(anti1.join(","));
+					anti1 = [anti1[0] + vector[0], anti1[1] + vector[1]];
+				}
+
+				while(anti2[0] >= 0 && anti2[0] < row && anti2[1] >= 0 && anti2[1] < colSize) {
+					antinodes2.set(anti2.join(","));
+					anti2 = [anti2[0] - vector[0], anti2[1] - vector[1]];
+				}
 			}
 		}
 	}
 
 	displayCaption(`The number of unique antinodes is ${antinodes.size}.`);
+	displayCaption(`The number of resonant antinodes is ${antinodes2.size}.`);
 }
