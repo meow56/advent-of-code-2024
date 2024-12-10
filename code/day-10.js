@@ -95,10 +95,25 @@ function day10(input) {
 		return reachable9s;
 	}
 
+	function pathfind(start) {
+		if(start.height === 9) return 1;
+		let ratings = 0;
+		for(let neighbor of start.neighbors) {
+			ratings += pathfind(neighbor);
+		}
+		return ratings;
+	}
+
 	let sum = 0;
+	let totalRatings = 0;
 	for(let node of nodes) {
-		if(node.height === 0) sum += search(node);
+		if(node.height === 0) {
+			sum += search(node);
+			totalRatings += pathfind(node);
+		}
+
 	}
 
 	displayCaption(`The sum of scores is ${sum}.`);
+	displayCaption(`The sum of ratings is ${totalRatings}.`);
 }
