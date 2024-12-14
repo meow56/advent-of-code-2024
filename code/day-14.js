@@ -17,6 +17,11 @@ function day14(input) {
 	}
 
 	displayCaption(`The safety score is ${quads.reduce((a, v) => a * v)}.`);
+	displayCaption(`The robots are displayed.`);
+	displayCaption(`It's up to you to find the tree yourself.`);
+	displayCaption(`First, find the time where it looks like there's a vertical stripe.`);
+	displayCaption(`Then, use the Plus 101 button to skip to the next time that happens.`);
+	displayCaption(`Keep doing that until the tree appears.`);
 
 	function displayRobots(time) {
 		let grid = [];
@@ -44,8 +49,8 @@ function day14(input) {
 			displayRobots(num);
 		}
 
-		function add100() {
-			num += 100;
+		function add101() {
+			num += 101;
 			displayRobots(num);
 		}
 
@@ -54,20 +59,20 @@ function day14(input) {
 			displayRobots(num);
 		}
 
-		function minus100() {
-			num = Math.max(0, num - 100);
+		function minus101() {
+			num = Math.max(0, num - 101);
 			displayRobots(num);
 		}
 
 		displayRobots(num);
 
-		return [next, prev, add100, minus100];
+		return [next, prev, add101, minus101];
 	}
 
-	let [next, prev, add100, minus100] = loopTime();
+	let [next, prev, add101, minus101] = loopTime();
 
-	assignButton(minus100, "Minus 100");
+	assignButton(minus101, "Minus 101");
 	assignButton(prev, "Previous");
 	assignButton(next, "Next");
-	assignButton(add100, "Plus 100");
+	assignButton(add101, "Plus 101");
 }
