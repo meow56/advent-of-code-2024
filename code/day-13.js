@@ -5,13 +5,19 @@ function day13(input) {
 	let entry;
 	let machines = [];
 	let machine = [];
+	let newMachines = [];
+	let newMachine = [];
 	while(entry = FILE_REGEX.exec(input)) {
 		if(entry[1]) {
 			machine.push([entry[1], +entry[2], +entry[3]]);
+			newMachine.push([entry[1], +entry[2], +entry[3]]);
 		} else {
 			machine.push([+entry[4], +entry[5]]);
+			newMachine.push([10000000000000 + +entry[4], 10000000000000 + +entry[5]]);
 			machines.push(machine);
+			newMachines.push(newMachine);
 			machine = [];
+			newMachine = [];
 		}
 	}
 
@@ -40,35 +46,25 @@ function day13(input) {
 			}
 			if(done) break;
 		}
-		continue;
+	}
 
-		let xGCF = gcf(machine[0][1], machine[1][1]);
-		let yGCF = gcf(machine[0][2], machine[1][2]);
-		let xLCM = machine[0][1] * machine[1][1] / xGCF;
-		let yLCM = machine[0][2] * machine[1][2] / yGCF;
-
-		let xCycleCost = Math.min(xLCM * 3 / machine[0][1], xLCM / machine[1][1]);
-		let yCycleCost = Math.min(yLCM * 3 / machine[0][2], yLCM / machine[1][2]);
-
-		// let a, @ be x and y increase for A
-		// let b, e be x and y increase for B
-		// we want to minimize T = 3A + B
-		// with the constraints
+	let newTokens = 0;
+	for(let machine of newMachines) {
 		// aA + bB = X
 		// @A + eB = Y
-		// (X - bB) / a = A
-		// (3X + (a - 3b)B) / a = T
-		// T' = (a - 3b) / a
-		// = 0 when a = 3b and a !== 0
-		// 
+		// @A + (b@/a)B = (@/a)X
+		// (e - b@/a)B = Y - (@/a)X
+		// B = (aY - @X) / (ae - b@)
+		// A = (X - bB) / a
 
-		// (Y - eB) / @ = A
-		// (3Y + (@ - 3e)B) / @ = y
-		// y' = (@ - 3e) / @
-		// = 0 when @ = 3e and 
+		let B = ((machine[2][1] * machine[0][1]) - (machine[0][2] * machine[2][0])) / ((machine[1][2] * machine[0][1]) - (machine[1][1] * machine[0][2]));
+		if(Math.floor(B) !== B) continue;
 
-
+		let A = (machine[2][0] - (machine[1][1] * B)) / machine[0][1];
+		if(Math.floor(A) !== A) continue;
+		newTokens += 3 * A + B;
 	}
 
 	displayCaption(`The number of tokens to spend is ${tokens}.`);
+	displayCaption(`The actual number of tokens you're getting scammed out of is ${newTokens}.`);
 }
