@@ -18,25 +18,8 @@ function day16(input) {
 		}
 	}
 
-	function Node(pos) {
-		this.pos = pos;
-
-		this.neighbors = [];
-	}
-
-	Node.prototype.initNeighbors = function() {
-		let lNeighbor = [this.pos[0], this.pos[1] - 1];
-		let uNeighbor = [this.pos[0] - 1, this.pos[1]];
-		let rNeighbor = [this.pos[0], this.pos[1] + 1];
-		let dNeighbor = [this.pos[0] + 1, this.pos[1]];
-
-		if(grid[lNeighbor[1]][lNeighbor[0]] !== "#") {
-			this.neighbors.push(explore(lNeighbor, [0, -1]));
-		}
-	}
-
-	function explore(coord, dir) {
-
+	function distanceToEnd(pos) {
+		return Math.abs(endPos[0] - pos[0]) + Math.abs(endPos[1] - pos[1]);
 	}
 
 	let pos = startPos.slice();
@@ -87,13 +70,34 @@ function day16(input) {
 		let lNeighbor = [next[0][0] + lDir[0], next[0][1] + lDir[1]];
 		let rNeighbor = [next[0][0] + rDir[0], next[0][1] + rDir[1]];
 		if(grid[fNeighbor[1]][fNeighbor[0]] !== "#") {
-			toExplore.push([fNeighbor.slice(), next[1].slice(), next[2] + 1, [...(next[3]), mapKey]]);
+			let insertIndex = 0;
+			for(; insertIndex < toExplore.length; insertIndex++) {
+				if(distanceToEnd(toExplore[insertIndex][0]) >= distanceToEnd(fNeighbor)) {
+					insertIndex--;
+					break;
+				}
+			}
+			toExplore.splice(insertIndex, 0, [fNeighbor.slice(), next[1].slice(), next[2] + 1, [...(next[3]), mapKey]]);
 		}
 		if(grid[lNeighbor[1]][lNeighbor[0]] !== "#") {
-			toExplore.push([lNeighbor.slice(), lDir.slice(), next[2] + 1001, [...(next[3]), mapKey]]);
+			let insertIndex = 0;
+			for(; insertIndex < toExplore.length; insertIndex++) {
+				if(distanceToEnd(toExplore[insertIndex][0]) >= distanceToEnd(lNeighbor)) {
+					insertIndex--;
+					break;
+				}
+			}
+			toExplore.splice(insertIndex, 0, [lNeighbor.slice(), lDir.slice(), next[2] + 1001, [...(next[3]), mapKey]]);
 		}
 		if(grid[rNeighbor[1]][rNeighbor[0]] !== "#") {
-			toExplore.push([rNeighbor.slice(), rDir.slice(), next[2] + 1001, [...(next[3]), mapKey]]);
+			let insertIndex = 0;
+			for(; insertIndex < toExplore.length; insertIndex++) {
+				if(distanceToEnd(toExplore[insertIndex][0]) >= distanceToEnd(rNeighbor)) {
+					insertIndex--;
+					break;
+				}
+			}
+			toExplore.splice(insertIndex, 0, [rNeighbor.slice(), rDir.slice(), next[2] + 1001, [...(next[3]), mapKey]]);
 		}
 	}
 
@@ -128,4 +132,5 @@ function day16(input) {
 
 	displayCaption(`The minimum score is ${minScore}.`);
 	displayCaption(`The number of optimal seats is ${uniqueTiles.length}.`);
+	displayCaption(`The map is shown. The tiles that are part of optimal paths are shown with ▒.`);
 }
