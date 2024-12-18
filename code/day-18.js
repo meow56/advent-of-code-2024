@@ -51,24 +51,59 @@ function day18(input) {
 		node.initNeighbors();
 	}
 
-	for(let i = 0; i < 1024; i++) {
+	for(let i = 0; i < corrupt.length; i++) {
 		findNode(corrupt[i]).corruptsAt = i + 1;
 	}
 
-	let explored = [];
-	let toExplore = [findNode([0, 0])];
-	findNode([0, 0]).dist = 0;
-	while(toExplore.length !== 0) {
-		let next = toExplore.shift();
-		explored.push(next.pos.join(","));
-		for(let neighbor of next.neighbors) {
-			if(neighbor.dist === -1) {
-				if(neighbor.corruptsAt) continue;
-				neighbor.dist = next.dist + 1;
-				toExplore.push(neighbor);
+	function BFS(time) {
+		for(let node of nodes) {
+			node.dist = -1;
+			node.pre = undefined;
+		}
+		let explored = [];
+		let toExplore = [findNode([0, 0])];
+		findNode([0, 0]).dist = 0;
+		while(toExplore.length !== 0) {
+			let next = toExplore.shift();
+			explored.push(next.pos.join(","));
+			for(let neighbor of next.neighbors) {
+				if(neighbor.dist === -1) {
+					if(neighbor.corruptsAt > 0 && neighbor.corruptsAt <= time) continue;
+					neighbor.dist = next.dist + 1;
+					neighbor.pre = next;
+					toExplore.push(neighbor);
+				}
 			}
 		}
 	}
 
+	BFS(1024);
 	displayCaption(`The distance to the exit is ${findNode([70, 70]).dist}.`);
+
+	let prePath = genPrePath();
+	function genPrePath() {
+		let prePath = [];
+		let curr = findNode([70, 70]);
+		let start = findNode([0, 0]);
+		while(curr !== start) {
+			prePath.unshift(curr);
+			curr = curr.pre;
+		}
+		return prePath;
+	}
+
+	let minTime = 0;
+	for(let i = 1024; i < corrupt.length; i++) {
+		let newCorrupt = findNode(corrupt[i]);
+		if(prePath.includes(newCorrupt)) {
+			BFS(i + 1);
+			if(findNode([70, 70]).dist === -1) {
+				minTime = i + 1;
+				break;
+			}
+			prePath = genPrePath();
+		}
+	}
+
+	displayCaption(`The first cutoff time is ${corrupt[minTime - 1]}.`);
 }
