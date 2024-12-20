@@ -97,8 +97,10 @@ function day20(input) {
 		}
 	}
 
-	displayCaption(`The number of good cheats is ${cheat100}.`);
-	displayCaption(`The number of 20x good cheats is ${cheat10020}.`);
+	displayCaption(`The number of length 2 cheats that save at least 100 picoseconds is ${cheat100}.`);
+	displayCaption(`The number of length 20 or less cheats that save at least 100 picoseconds is ${cheat10020}.`);
+	displayCaption(`The number of cheats that save a certain number of picoseconds is shown.`);
+	displayCaption(`Use the buttons to switch between parts 1 and 2.`);
 
 	assignPane("p1", "Part 1");
 	assignPane("p2", "Part 2");
@@ -116,6 +118,6 @@ function day20(input) {
 	sortedCheatTimes20.sort((a, b) => a[0] - b[0]);
 	let maxSaveLength20 = sortedCheatTimes20[sortedCheatTimes20.length - 1][0].toString().length;
 	for(let [key, value] of sortedCheatTimes20) {
-		displayToPane("p2", `There are ${value.toString().padStart(maxCountLength20, " ")} cheats that save ${key.toString().padStart(maxSaveLength2, " ")} picoseconds.`);
+		displayToPane("p2", `There are ${value.toString().padStart(maxCountLength20, " ")} cheats that save ${key.toString().padStart(maxSaveLength20, " ")} picoseconds.`);
 	}
 }
