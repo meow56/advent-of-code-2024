@@ -30,7 +30,6 @@ function day20(input) {
 
 	let path = [startPos.slice()];
 	while(!samePos(path[path.length - 1], endPos)) {
-		console.log(path);
 		let uNeigh = [path[path.length - 1][0], path[path.length - 1][1] - 1];
 		let rNeigh = [path[path.length - 1][0] + 1, path[path.length - 1][1]];
 		let dNeigh = [path[path.length - 1][0], path[path.length - 1][1] + 1];
@@ -47,7 +46,7 @@ function day20(input) {
 	}
 
 	let coordToTime = new Map();
-	let cheatTimes = new Map();
+	let cheatTimes2 = new Map();
 	path.forEach((elem, index) => coordToTime.set(elem.join(","), index));
 	let cheat100 = 0;
 	for(let i = 0; i < grid.length; i++) {
@@ -68,19 +67,55 @@ function day20(input) {
 					let cheatSave = neighbors[l] - neighbors[k] - 2;
 					if(cheatSave === 0) continue;
 					if(cheatSave >= 100) cheat100++;
-					if(cheatTimes.has(cheatSave)) {
-						cheatTimes.set(cheatSave, cheatTimes.get(cheatSave) + 1);
+					if(cheatTimes2.has(cheatSave)) {
+						cheatTimes2.set(cheatSave, cheatTimes2.get(cheatSave) + 1);
 					} else {
-						cheatTimes.set(cheatSave, 1);
+						cheatTimes2.set(cheatSave, 1);
 					}
 				}
 			}
 		}
 	}
 
-	displayCaption(`The number of good cheats is ${cheat100}.`);
+	function manhattan(a, b) {
+		return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+	}
 
-	for(let [key, value] of cheatTimes.entries()) {
-		displayText(`${key}: ${value}`);
+	let cheatTimes20 = new Map();
+	let cheat10020 = 0;
+	for(let tile of path) {
+		let close = path.filter(elem => manhattan(elem, tile) <= 20);
+		close = close.map(elem => coordToTime.get(elem.join(",")) - coordToTime.get(tile.join(",")) - manhattan(elem, tile));
+		for(let time of close) {
+			if(time <= 0) continue;
+			if(cheatTimes20.has(time)) {
+				cheatTimes20.set(time, cheatTimes20.get(time) + 1);
+			} else {
+				cheatTimes20.set(time, 1);
+			}
+			if(time >= 100) cheat10020++;
+		}
+	}
+
+	displayCaption(`The number of good cheats is ${cheat100}.`);
+	displayCaption(`The number of 20x good cheats is ${cheat10020}.`);
+
+	assignPane("p1", "Part 1");
+	assignPane("p2", "Part 2");
+	let sortedCheatTimes2 = [...cheatTimes2.entries()];
+	sortedCheatTimes2.sort((a, b) => a[1] - b[1]);
+	let maxCountLength2 = sortedCheatTimes2[sortedCheatTimes2.length - 1][1].toString().length;
+	sortedCheatTimes2.sort((a, b) => a[0] - b[0]);
+	let maxSaveLength2 = sortedCheatTimes2[sortedCheatTimes2.length - 1][0].toString().length;
+	for(let [key, value] of sortedCheatTimes2) {
+		displayToPane("p1", `There are ${value.toString().padStart(maxCountLength2, " ")} cheats that save ${key.toString().padStart(maxSaveLength2, " ")} picoseconds.`);
+	}
+	let sortedCheatTimes20 = [...cheatTimes20.entries()];
+	sortedCheatTimes20.sort((a, b) => a[1] - b[1]);
+	let maxCountLength20 = sortedCheatTimes20[sortedCheatTimes20.length - 1][1].toString().length;
+	sortedCheatTimes20.sort((a, b) => a[0] - b[0]);
+	let maxSaveLength20 = sortedCheatTimes20[sortedCheatTimes20.length - 1][0].toString().length;
+	for(let [key, value] of sortedCheatTimes20) {
+		displayToPane("p2", `There are ${value.toString().padStart(maxCountLength20, " ")} cheats that save ${key.toString().padStart(maxSaveLength2, " ")} picoseconds.`);
 	}
 }
