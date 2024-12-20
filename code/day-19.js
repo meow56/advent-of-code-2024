@@ -14,18 +14,9 @@ function day19(input) {
 		patterns.push(entry[0]);
 	}
 
-	let towelMap = new Map();
-	for(let towel of towels) {
-		if(towelMap.has(towel[0])) {
-			towelMap.get(towel[0]).push(towel);
-		} else {
-			towelMap.set(towel[0], [towel]);
-		}
-	}
-
 	function findPattern(pattern) {
 		if(pattern.length === 0) return true;
-		for(let match of towelMap.get(pattern[0])) {
+		for(let match of towels) {
 			if(pattern.startsWith(match)) {
 				if(findPattern(pattern.replace(match, ""))) return true;
 			}
@@ -34,9 +25,40 @@ function day19(input) {
 	}
 
 	let possible = 0;
+	let possiblePatterns = [];
 	for(let pattern of patterns) {
-		possible += findPattern(pattern);
+		let result = findPattern(pattern);
+		if(result) {
+			possible++;
+			possiblePatterns.push(pattern);
+		}
+	}
+
+	let patternMap = new Map([["", 1]]);
+	function numSeqs(pattern) {
+		if(patternMap.has(pattern)) return patternMap.get(pattern);
+		if(pattern.length === 1) {
+			patternMap.set(pattern, +(towels.includes(pattern)));
+			return +(towels.includes(pattern));
+		}
+		let possible = 0;
+		for(let i = 1; i <= pattern.length; i++) {
+			let start = pattern.slice(0, i);
+			let rest = pattern.slice(i);
+			possible += patternMap.get(rest) * +(towels.includes(start));
+		}
+		patternMap.set(pattern, possible);
+		return possible;
+	}
+
+	let sequences = 0;
+	for(let pattern of possiblePatterns) {
+		for(let i = 1; i < pattern.length; i++) {
+			numSeqs(pattern.slice(-i));
+		}
+		sequences += numSeqs(pattern);
 	}
 
 	displayCaption(`The number of possible patterns is ${possible}.`);
+	displayCaption(`The number of different ways to make each design is ${sequences}.`);
 }
