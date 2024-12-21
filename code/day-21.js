@@ -51,7 +51,8 @@ function day21(input) {
 		[">", [2, 1]],
 		]);
 	function inputToArrowKeys(code) {
-		let pos = arrowKeys.get("A").slice();
+		let pos = arrowKeys.get(code[0]).slice();
+		code = code.slice(1);
 		let seq = "";
 		for(let char of code) {
 			let target = arrowKeys.get(char);
@@ -59,7 +60,7 @@ function day21(input) {
 			let yDiff = target[1] - pos[1];
 			let xChar = xDiff < 0 ? "<" : ">";
 			let yChar = yDiff < 0 ? "^" : "v";
-			if(yChar === "v") {
+			if((xChar === ">" && !(target[1] === 0 && pos[0] === 0)) || (target[0] === 0 && pos[1] === 0)) {
 				seq += yChar.repeat(Math.abs(yDiff));
 				seq += xChar.repeat(Math.abs(xDiff));
 			} else {
@@ -72,22 +73,45 @@ function day21(input) {
 		return seq;
 	}
 
+	function getASeqs(code) {
+		let arraySeqs = code.split("A").slice(0, -1);
+		let retVal = new Map();
+		for(let seq of arraySeqs) {
+			retVal.set(seq, (retVal.get(seq) ?? 0) + 1);
+		}
+		return retVal;
+	}
+
 	function escape(text) {
 		text = text.replaceAll("<", "&lt;");
 		text = text.replaceAll(">", "&gt;");
 		return text;
 	}
 
+	function getLength(m) {
+		return [...m.entries()].reduce((acc, val) => acc + (val[0].length + 1) * val[1], 0);
+	}
+
 	let complexitySum = 0;
+	let complexitySum25 = 0;
+	let aSeqToArrowKeys = new Map([["", new Map([["", 1]])]]);
 	for(let code of codes) {
-		let result = inputToArrowKeys(inputToArrowKeys(codeToNumpadInput(code)));
-		displayText(code);
-		displayText(escape(codeToNumpadInput(code)));
-		displayText(escape(inputToArrowKeys(codeToNumpadInput(code))));
-		displayText(escape(result));
-		console.log(result, parseInt(code, 10), inputToArrowKeys(codeToNumpadInput(code)));
-		complexitySum += result.length * parseInt(code, 10);
+		let result = getASeqs(codeToNumpadInput(code));
+		for(let i = 0; i < 25; i++) {
+			let newResult = new Map();
+			for(let [key, value] of result.entries()) {
+				let trans = aSeqToArrowKeys.get(key) ?? getASeqs(inputToArrowKeys("A" + key + "A"));
+				aSeqToArrowKeys.set(key, trans);
+				for(let [pair, mult] of trans.entries()) {
+					newResult.set(pair, (newResult.get(pair) ?? 0) + (value * mult));
+				}
+			}
+			result = newResult;
+			if(i === 1) complexitySum += getLength(result) * parseInt(code, 10);
+		}
+		complexitySum25 += getLength(result) * parseInt(code, 10);
 	}
 
 	displayCaption(`The complexity sum is ${complexitySum}.`);
+	displayCaption(`The complexity sum 25 is ${complexitySum25}.`);
 }
