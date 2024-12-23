@@ -53,5 +53,34 @@ function day23(input) {
 		}
 	}
 
+	function intersection(a, b) {
+		let inter = [];
+		for(let elem of a) {
+			if(b.includes(elem)) inter.push(elem);
+		}
+		return inter;
+	}
+
+	let tupleMap = new Map();
+	function largestTupleWithNeighbors(comps) {
+		let mapKey = comps.map(e => e.name).toSorted().join(",");
+		if(tupleMap.has(mapKey)) return tupleMap.get(mapKey);
+		let sharedNeighbors = computers.slice();
+		for(let i = 0; i < comps.length; i++) {
+			sharedNeighbors = intersection(sharedNeighbors, comps[i].connections);
+		}
+		if(sharedNeighbors.length === 0) return comps;
+		let max = [];
+		for(let comp of sharedNeighbors) {
+			let result = largestTupleWithNeighbors([...comps, comp]);
+			if(result.length > max.length) max = result;
+		}
+		tupleMap.set(mapKey, max);
+		return max;
+	}
+
+	let largestGroup = largestTupleWithNeighbors([]);
+
 	displayCaption(`The number of parties is ${tTrios.length}.`);
+	displayCaption(`The password is "${largestGroup.map(e => e.name).toSorted().join(",")}".`);
 }
